@@ -61,7 +61,7 @@ public class Tail {
 
         try (BufferedWriter to = Files.newBufferedWriter(Paths.get(output))) {
 
-            if (files != null) {
+            if (files.size()!=0) {
                 String allLines;
                 String line;
                 BufferedReader from;
@@ -107,7 +107,7 @@ public class Tail {
     private void toConsoleLastChars(int num, List<String> files) {
 
         try {
-            if (files != null) {
+            if (files.size()!=0) {
                 for (int j = 0; j < files.size(); j++) {
 
                     RandomAccessFile from = new RandomAccessFile(new File(files.get(j)), "r");
@@ -144,7 +144,7 @@ public class Tail {
 
         try (BufferedWriter to = Files.newBufferedWriter(Paths.get(output))) {
 
-            if (files != null) {
+            if (files.size()!=0) {
                 List<String> allLines;
                 String line;
                 BufferedReader from;
@@ -196,7 +196,7 @@ public class Tail {
 
         try {
             List<String> allLines;
-            if (files != null) {
+            if (files.size()!=0) {
                 String line;
                 BufferedReader from;
                 for (int j = 0; j < files.size(); j++) {

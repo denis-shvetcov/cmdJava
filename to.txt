@@ -1,6 +1,33 @@
-charFrom1.txt
-2009 and recorded in a communal environment
-involving numerous contributing musicians and producers.
-charFrom2.txt
-uences including hip hop,
-soul, baroque pop, electro, indie rock, synth-pop, industrial, and gospel.
+from1.txt
+11
+12
+13
+14
+15
+16
+17
+18
+19
+20
+from2.txt
+11
+12
+13
+14
+15
+16
+17
+18
+19
+20
+from3.txt
+11
+12
+13
+14
+15
+16
+17
+18
+19
+20

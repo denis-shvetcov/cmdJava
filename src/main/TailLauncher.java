@@ -43,10 +43,10 @@ public class TailLauncher {
             parser.parseArgument(args);
         } catch (CmdLineException exc) {
             System.err.println(exc.getMessage());
-
             parser.printUsage(System.err);
             return;
         }
+
 
         Tail tail = new Tail(output,charN,stringN,files);
 

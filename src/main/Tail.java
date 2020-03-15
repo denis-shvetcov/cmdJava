@@ -30,43 +30,32 @@ public class Tail {
         }
 
         if (charN != null) {
-            if (output != null) {
-                toFileLastChars(charN, files, output);
-            } else {
-                toConsoleLastChars(charN, files);
-
-            }
+            lastChars(charN, files, output);
         }
 
         if (stringN != null) {
-            if (output != null) {
-                toFileLastStrings(stringN, files, output);
-            } else {
-                toConsoleLastStrings(stringN, files);
-            }
+            lastStrings(stringN, files, output);
         }
 
         if (stringN == null && charN == null) {
-            if (output != null) {
-                toFileLastStrings(10, files, output);
-            } else {
-                toConsoleLastStrings(10, files);
-            }
+            lastStrings(10, files, output);
         }
 
     }
 
     // Символы читаются в файл output.
-    private void toFileLastChars(int num, List<String> files, String output) {
+    private void lastChars(int num, List<String> files, String output) {
 
-        try (BufferedWriter to = Files.newBufferedWriter(Paths.get(output))) {
+        try (BufferedWriter to = output != null ? Files.newBufferedWriter(Paths.get(output)) :
+                new BufferedWriter(new OutputStreamWriter(System.out))) {
 
-            if (files.size()!=0) {
-                String allLines;
-                String line;
+            String allLines;
+            String line;
+
+            if (files.size() != 0) {
                 BufferedReader from;
                 for (int j = 0; j < files.size(); j++) {
-                    allLines="";
+                    allLines = "";
                     from = Files.newBufferedReader(Paths.get(files.get(j)));
 
                     if (files.size() > 1) {
@@ -74,22 +63,23 @@ public class Tail {
                         to.newLine();
                     }
 
-
                     while ((line = from.readLine()) != null) {
-                        allLines+= line +"\n";
+                        allLines += line + "\n";
                     }
-                    allLines = allLines.substring(0,allLines.length()-1);//убираем лишний перенос
-                    to.write(allLines.substring(Math.max(allLines.length()-num,0)));
-                    if (j!=files.size()-1) to.newLine(); // добавяляем строку. Если файл последний, то переноса нет.
+                    allLines = allLines.substring(0, allLines.length() - 1);//убираем лишний перенос
+                    to.write(allLines.substring(Math.max(allLines.length() - num, 0)));
+                    if (j != files.size() - 1) to.newLine(); // добавяляем строку. Если файл последний, то переноса нет.
                     from.close();
                 }
             } else {
                 //Если нет файлов, из которых мы берем символы, то читаем num символов из консоли
                 Scanner scan = new Scanner(System.in);
-                String str = scan.nextLine(); // читаем введенный текст
+                allLines= "";
+                System.out.println("Write \"stop\" to close InputStream");
+                while (!(line=scan.nextLine()).equals("stop")) allLines+=line + "\n";
+                to.write(allLines.substring(allLines.length()-num-1,allLines.length()-1)); // убираем лишний перенос
                 scan.close();
-                //если длина str больше, чем num, то записываем все символы, иначе записываем весь str
-                to.write(str.substring(str.length() > num ? str.length() - num : 0));
+
             }
 
         } catch (FileNotFoundException exc) {
@@ -103,50 +93,14 @@ public class Tail {
 
     }
 
-    //Символы читаются в консоль.
-    private void toConsoleLastChars(int num, List<String> files) {
 
-        try {
-            if (files.size()!=0) {
-                for (int j = 0; j < files.size(); j++) {
+    private void lastStrings(int num, List<String> files, String output) {
 
-                    RandomAccessFile from = new RandomAccessFile(new File(files.get(j)), "r");
-
-                    if (files.size() > 1) {
-                        System.out.println(new File(files.get(j)).getName());
-                    }
-
-                    from.seek(from.length() - num > 0 ? from.length() - num : 0);
-
-                    for (int i = (int) from.length() - num; i < from.length(); i++) {
-                        System.out.print((char) from.read());
-                    }
-                    System.out.println();
-                    from.close();
-                }
-            } else {
-                //Если нет файлов, из которых мы берем символы, то читаем num символов из консоли
-                Scanner scan = new Scanner(System.in);
-                String str = scan.nextLine(); // читаем введенный текст
-                scan.close();
-                //если длина str больше, чем num, то записываем все символы, иначе записываем весь str
-                System.out.println(str.substring(str.length() > num ? str.length() - num : 0));
-            }
-
-        } catch (IOException exc) {
-            System.out.println("Problems with reading, writing or closing files.");
-            System.out.println(exc.getMessage());
-        }
-
-    }
-
-    private void toFileLastStrings(int num, List<String> files, String output) {
-
-        try (BufferedWriter to = Files.newBufferedWriter(Paths.get(output))) {
-
-            if (files.size()!=0) {
-                List<String> allLines;
-                String line;
+        try (BufferedWriter to = output != null ? Files.newBufferedWriter(Paths.get(output)) :
+                new BufferedWriter(new OutputStreamWriter(System.out))) {
+            List<String> allLines;
+            String line;
+            if (files.size() != 0) {
                 BufferedReader from;
                 for (int j = 0; j < files.size(); j++) {
 
@@ -163,67 +117,25 @@ public class Tail {
                          i < allLines.size(); i++) {
                         to.write(allLines.get(i));
                         //если последний файл и последняя строка, то перенос не нужен
-                        if (i!= allLines.size()-1 || j!=files.size()-1) to.newLine();
+                        if (i != allLines.size() - 1 || j != files.size() - 1) to.newLine();
                     }
 
                     from.close();
                 }
             } else {
                 //Если нет файлов, из которых мы берем символы, то читаем num строк из консоли
-                int countLines = 0;
                 Scanner scan = new Scanner(System.in);
-                while (countLines < num) {
-                    to.write(scan.nextLine());
-                    to.newLine();
-                    countLines++;
-                }
-
-                scan.close();
-            }
-
-        } catch (FileNotFoundException exc) {
-            System.out.println("File doesn't exist");
-            System.out.println(exc.getMessage());
-
-        } catch (IOException exc) {
-            System.out.println("Problems with reading, writing or closing files.");
-            System.out.println(exc.getMessage());
-        }
-
-    }
-
-    private void toConsoleLastStrings(int num, List<String> files) {
-
-        try {
-            List<String> allLines;
-            if (files.size()!=0) {
-                String line;
-                BufferedReader from;
-                for (int j = 0; j < files.size(); j++) {
-                    allLines = new ArrayList<>();
-                    from = Files.newBufferedReader(Paths.get(files.get(j)));
-
-                    if (files.size() > 1) {
-                        System.out.println(new File(files.get(j)).getName());
-                    }
-
-                    allLines = Files.readAllLines(Paths.get(output));
-
-                    for (int i = Math.max(allLines.size() - num, 0);
-                         i < allLines.size(); i++) {
-                        System.out.println(allLines.get(i));
-                    }
-                    from.close();
-                }
-            } else {
-                //Если нет файлов, из которых мы берем символы, то читаем num строк из консоли
                 allLines = new ArrayList<>();
-                Scanner scan = new Scanner(System.in);
-                while (allLines.size() < num) {
-                    allLines.add(scan.nextLine());
+
+                System.out.println("Write \"stop\" to close InputStream");
+                while (!(line = scan.nextLine()).equals("stop"))
+                    allLines.add(line);
+
+                for (int i = Math.max(allLines.size() - num, 0);
+                     i < allLines.size(); i++) {
+                    to.write(allLines.get(i));
+                    if (i != allLines.size() - 1) to.newLine();
                 }
-                for (String str : allLines)
-                    System.out.println(str);
                 scan.close();
             }
 
@@ -235,6 +147,8 @@ public class Tail {
             System.out.println("Problems with reading, writing or closing files.");
             System.out.println(exc.getMessage());
         }
-
     }
 }
+
+
+

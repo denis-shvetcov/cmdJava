@@ -27,7 +27,7 @@ public class TailLauncher {
     private List<String> files = new ArrayList<>();
 
 
-    public static void main(String[] args)   {
+    public static void main(String[] args) {
         try {
             if (args.length > 0) new TailLauncher().launch(args);
         } catch (IOException exc) {
@@ -47,15 +47,32 @@ public class TailLauncher {
             return;
         }
 
+        Tail tail;
 
-        Tail tail = new Tail(output,charN,stringN,files);
+        if (charN != null && stringN != null) {
+            System.err.println("Error: charN and stringN were entered at the same time");
+            return;
+        } else if (charN != null)
+            tail = new Tail(charN, false);
+        else if (stringN != null)
+            tail = new Tail(stringN, true);
+        else
+            tail = new Tail(10, true);
 
-        tail.cutTail();
 
 
-
+        try (BufferedWriter to = output != null ? Files.newBufferedWriter(Paths.get(output)) :
+                new BufferedWriter(new OutputStreamWriter(System.out))) {
+            for (int i = 0; i < files.size(); i++) {
+                if (files.size() > 1) {
+                        to.write(new File(files.get(i)).getName());
+                        to.newLine();
+                }
+                tail.cutTail(files.get(i), output, to);
+                to.newLine();
+            }
+        }
     }
-
 
 
 }

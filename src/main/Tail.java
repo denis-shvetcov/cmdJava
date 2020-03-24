@@ -1,11 +1,10 @@
 package main;
 
-import java.io.*;
-import java.nio.file.Files;
-import java.nio.file.Paths;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Scanner;
+import java.io.BufferedReader;
+import java.io.BufferedWriter;
+import java.io.IOException;
+import java.util.Deque;
+import java.util.LinkedList;
 
 public class Tail {
 
@@ -17,81 +16,55 @@ public class Tail {
         this.byLines = byLines;
     }
 
-    public void cutTail(String input, String output, BufferedWriter writer) {
+    public void cutTail(BufferedReader reader, BufferedWriter writer) {
         if (byLines)
-            lastStrings(input, output, writer);
+            lastStrings(reader, writer);
         else
-            lastChars(input, output, writer);
+            lastChars(reader, writer);
     }
 
-    // Символы читаются в файл output.
-    private void lastChars(String input, String output, BufferedWriter to) {
+    private void lastChars(BufferedReader from, BufferedWriter to) {
 
         try {
-            String allLines;
-            String line;
-            if (input != null) {
-                BufferedReader from = Files.newBufferedReader(Paths.get(input));
-                allLines = "";
-
-                while ((line = from.readLine()) != null) {
-                    allLines += line + "\n";
+            Deque<Character> list = new LinkedList<>();
+            int currentLength = 0; // размер списка без переносов
+            int letter;
+            while ((letter = from.read()) > 0) {
+                if (currentLength == num) {
+                    while (System.lineSeparator().contains(list.peekFirst().toString()))
+                        list.pollFirst(); //убираем символы переноса \r и \n
+                    list.pollFirst();
+                    currentLength--;
                 }
-                allLines = allLines.substring(0, allLines.length() - 1);//убираем лишний перенос
-                to.write(allLines.substring(Math.max(allLines.length() - num, 0)));
-                from.close();
-            } else {
-                //Если нет файлов, из которых мы берем символы, то читаем num символов из консоли
-                Scanner scan = new Scanner(System.in);
-                allLines = "";
-                System.out.println("Write \"stop\" to close InputStream");
-                while (!(line = scan.nextLine()).equals("stop")) allLines += line + "\n";
-                to.write(allLines.substring(allLines.length() - num)); // убираем лишний перенос
-                scan.close();
+                list.addLast((char) letter);
+                if (!System.lineSeparator().contains(list.peekLast().toString()))
+                    currentLength++;
             }
 
-        } catch (FileNotFoundException exc) {
-            System.out.println(exc.getMessage());
-            System.out.println("File doesn't exist");
-        } catch (IOException exc) {
+            for (int c : list)
+                to.write(c);
+
+        } catch (
+                IOException exc) {
             System.out.println(exc.getMessage());
             System.out.println("Problems with reading, writing or closing files.");
-        }
 
+        }
     }
 
-    private void lastStrings(String input, String output, BufferedWriter to) {
+    private void lastStrings(BufferedReader from, BufferedWriter to) {
 
         try {
-            List<String> allLines;
+            Deque<String> list = new LinkedList<>();
             String line;
-            if (input != null) {
-                allLines = Files.readAllLines(Paths.get(input));
-                for (int i = Math.max(allLines.size() - num, 0); i < allLines.size(); i++) {
-                    to.write(allLines.get(i));
-                    //если последний файл и последняя строка, то перенос не нужен
-                    if (i != allLines.size() - 1) to.newLine();
-                }
-            } else {
-                //Если нет файлов, из которых мы берем символы, то читаем num строк из консоли
-                Scanner scan = new Scanner(System.in);
-                allLines = new ArrayList<>();
-
-                System.out.println("Write \"stop\" to close InputStream");
-                while (!(line = scan.nextLine()).equals("stop"))
-                    allLines.add(line);
-
-                for (int i = Math.max(allLines.size() - num, 0); i < allLines.size(); i++) {
-                    to.write(allLines.get(i));
-                    if (i != allLines.size() - 1) to.newLine();
-                }
-                scan.close();
+            while ((line = from.readLine()) != null) {
+                list.addLast(line);
+                if (list.size() > num) list.pollFirst();
             }
-
-        } catch (FileNotFoundException exc) {
-            System.out.println("File doesn't exist");
-            System.out.println(exc.getMessage());
-
+            while (list.size() != 0) {
+                to.write(list.pollFirst());
+                if (list.size() != 0) to.newLine(); // удаляется лишняя строка, перенос добавляется в лаунчере
+            }
         } catch (IOException exc) {
             System.out.println("Problems with reading, writing or closing files.");
             System.out.println(exc.getMessage());

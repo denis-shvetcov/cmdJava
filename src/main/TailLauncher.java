@@ -60,17 +60,18 @@ public class TailLauncher {
             tail = new Tail(10, true);
 
 
-
         try (BufferedWriter to = output != null ? Files.newBufferedWriter(Paths.get(output)) :
                 new BufferedWriter(new OutputStreamWriter(System.out))) {
             for (int i = 0; i < files.size(); i++) {
                 if (files.size() > 1) {
-                        to.write(new File(files.get(i)).getName());
-                        to.newLine();
+                    to.write(new File(files.get(i)).getName());
+                    to.newLine();
                 }
-                tail.cutTail(files.get(i), output, to);
+                tail.cutTail(Files.newBufferedReader(Paths.get(files.get(i))), to);
                 to.newLine();
             }
+            if (files.size() == 0) tail.cutTail(new BufferedReader(new InputStreamReader(System.in)), to);
+
         }
     }
 

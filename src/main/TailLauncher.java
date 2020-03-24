@@ -26,7 +26,6 @@ public class TailLauncher {
     @Argument(metaVar = "inputFiles", usage = "the files we copy from")
     private List<String> files = new ArrayList<>();
 
-
     public static void main(String[] args) {
         try {
             if (args.length > 0) new TailLauncher().launch(args);
@@ -75,8 +74,6 @@ public class TailLauncher {
             if (files.size() == 0) tail.cutTail(new BufferedReader(new InputStreamReader(System.in)), to);
         }
     }
-
-
 }
 
 

@@ -34,7 +34,6 @@ class TailTest {
     @Test
     void cutTail() {
 
-
         String[] args1 = new String[]{"-c", "100", "-o", "to.txt", "charFrom1.txt"};
         String[] args2 = new String[]{"-c", "80", "-o", "to.txt", "charFrom1.txt", "charFrom2.txt"};
         String[] args3 = new String[]{"-n", "13", "-o", "to.txt", "from1.txt"};

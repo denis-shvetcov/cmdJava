@@ -16,7 +16,7 @@ public class Tail {
         this.byLines = byLines;
     }
 
-    public void cutTail(BufferedReader reader, BufferedWriter writer) throws IOException{
+    void cutTail(BufferedReader reader, BufferedWriter writer) throws IOException{
         if (byLines)
             lastStrings(reader, writer);
         else

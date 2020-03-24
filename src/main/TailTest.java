@@ -3,45 +3,36 @@ package main;
 import org.junit.Assert;
 import org.junit.jupiter.api.Test;
 
+import java.io.BufferedReader;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 
 
-
 class TailTest {
-    private final String sep = System.lineSeparator();
 
-    private String readFile(String file) {
-        try {
-            return String.join(sep, Files.readAllLines(Paths.get(file)));
+    private boolean compareChars(String expected, String real) {
+        try(BufferedReader expRead = Files.newBufferedReader(Paths.get(expected));
+            BufferedReader realRead = Files.newBufferedReader(Paths.get(real))) {
+            if (expRead.read()!=realRead.read())
+                return false;
         } catch (IOException exc) {
             exc.printStackTrace();
         }
-        return "";
+        return true;
+    }
+
+    private boolean compareLines(String expected, String real) {
+        try {
+            return Files.readAllLines(Paths.get(expected)).equals(Files.readAllLines(Paths.get(real)));
+        } catch (IOException exc) {
+            exc.printStackTrace();
+        }
+        return false;
     }
 
     @Test
     void cutTail() {
-
-        String chars100 = " 2009 and recorded in a communal environment" + sep +
-                "involving numerous contributing musicians and producers.";
-
-        String chars80 = "charFrom1.txt" + sep + "n a communal environment" + sep +
-                "involving numerous contributing musicians and producers." + sep + "charFrom2.txt" + sep +
-                "p hop," + sep + "soul, baroque pop, electro, indie rock, synth-pop, industrial, and gospel.";
-
-        String string13 = String.join(sep, "8", "9", "10", "11", "12", "13", "14",
-                "15", "16", "17", "18", "19", "20");
-
-        String string5 = String.join(sep, "from1.txt", "16", "17", "18", "19",
-                "20", "from2.txt", "16", "17", "18", "19", "20", "from3.txt", "16", "17", "18", "19", "20");
-
-        String noCharNnoStringN1 = String.join(sep, "11", "12", "13", "14", "15", "16", "17", "18", "19", "20");
-        String noCharNnoStringN3 = String.join(sep, "from1.txt", "11", "12",
-                "13", "14", "15", "16", "17", "18", "19", "20", "from2.txt",
-                "11", "12", "13", "14", "15", "16", "17", "18", "19", "20", "from3.txt", "11", "12",
-                "13", "14", "15", "16", "17", "18", "19", "20");
 
 
         String[] args1 = new String[]{"-c", "100", "-o", "to.txt", "charFrom1.txt"};
@@ -52,22 +43,23 @@ class TailTest {
         String[] args6 = new String[]{"-o", "to.txt", "from1.txt", "from2.txt", "from3.txt"};
 
         TailLauncher.main(args1);
-        Assert.assertEquals(chars100, readFile("to.txt"));
+        Assert.assertTrue(compareChars("testExpected1.txt", "to.txt"));
 
         TailLauncher.main(args2);
-        Assert.assertEquals(chars80, readFile("to.txt"));
+        Assert.assertTrue(compareChars("testExpected2.txt", "to.txt"));
 
         TailLauncher.main(args3);
-        Assert.assertEquals(string13, readFile("to.txt"));
+        Assert.assertTrue(compareLines("testExpected3.txt", "to.txt"));
+
 
         TailLauncher.main(args4);
-        Assert.assertEquals(string5, readFile("to.txt"));
+        Assert.assertTrue(compareLines("testExpected4.txt", "to.txt"));
 
         TailLauncher.main(args5);
-        Assert.assertEquals(noCharNnoStringN1, readFile("to.txt"));
+        Assert.assertTrue(compareLines("testExpected5.txt", "to.txt"));
 
         TailLauncher.main(args6);
-        Assert.assertEquals(noCharNnoStringN3, readFile("to.txt"));
+        Assert.assertTrue(compareLines("testExpected6.txt", "to.txt"));
 
     }
 }

@@ -32,10 +32,12 @@ public class TailLauncher {
             if (args.length > 0) new TailLauncher().launch(args);
         } catch (IOException exc) {
             System.out.println(exc.getMessage());
+            System.out.println("Problems with reading, writing or closing files.");
+            System.exit(1);
         }
     }
 
-    private void launch(String[] args) throws IOException {
+    private void launch(String[] args)  throws IOException {
 
         CmdLineParser parser = new CmdLineParser(this);
 
@@ -71,7 +73,6 @@ public class TailLauncher {
                 to.newLine();
             }
             if (files.size() == 0) tail.cutTail(new BufferedReader(new InputStreamReader(System.in)), to);
-
         }
     }
 

@@ -11,12 +11,12 @@ public class Tail {
     private int num;
     private boolean byLines;
 
-    Tail(int num, boolean byLines) {
+   public Tail(int num, boolean byLines) {
         this.num = num;
         this.byLines = byLines;
     }
 
-    void cutTail(BufferedReader reader, BufferedWriter writer) throws IOException{
+   public void cutTail(BufferedReader reader, BufferedWriter writer) throws IOException{
         if (byLines)
             lastStrings(reader, writer);
         else
